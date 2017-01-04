@@ -39,7 +39,7 @@ public class Persistence {
             ps.setString(2, ls.getShortest());
             ps.setInt(3, ls.getLehgth());
             ps.setDouble(4, ls.getAvgWordLen());
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
             throw e;
@@ -76,12 +76,7 @@ public class Persistence {
             con = getConnection();
             PreparedStatement ps = con.prepareStatement("select * from Lines");
             ResultSet rs = ps.executeQuery();
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                System.out.println(rs.getMetaData().getColumnName(i + 1));
-            }
             while (rs.next()) {
-                rs.getInt("LINEID");
-                rs.getInt("FILEID");
                 String l = rs.getString("LONGEST");
                 String s = rs.getString("SHORTEST");
                 int len = rs.getInt("LEHGTH");
@@ -98,11 +93,8 @@ public class Persistence {
     }
 
     private void DBup() throws SQLException {
-        org.apache.derby.jdbc.EmbeddedDriver d;
-        Statement vStm;
         String createLines = "create table Lines  "
                 + "(LineId INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT Line_PK PRIMARY KEY, "
-                + " FileId INT, "
                 + " Longest VARCHAR(300), "
                 + " Shortest VARCHAR(300), "
                 + " LEHGTH INT NOT NULL, "
@@ -111,7 +103,8 @@ public class Persistence {
         try {
             con = getConnection();
             System.out.println("Connected to database: " + DB_NAME);
-            vStm = con.createStatement();
+            Statement vStm = con.createStatement();
+            vStm.execute("drop table Lines");
             if (!checkTable(con)) {
                 System.out.println(" . . . . creating table Lines");
                 vStm.execute(createLines);

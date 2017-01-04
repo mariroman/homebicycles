@@ -5,8 +5,12 @@
  */
 package consolefilestat;
 
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,13 +24,17 @@ import static org.junit.Assert.*;
  */
 public class PersistenceTest {
 
+    static Persistence instance;
     public PersistenceTest() {
     }
 
     @BeforeClass
     public static void setUpClass() {
-        System.out.println("setUpClass");
-//        Persistence.DBdown();
+        try {
+            instance = new Persistence();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @AfterClass
@@ -47,23 +55,24 @@ public class PersistenceTest {
     @Test
     public void testSaveLineStat() throws Exception {
         System.out.println("saveLineStat");
-        Persistence instance = new Persistence();
+        LineStat exStat = new LineStat("Longet", "shortest", 34, 6.4424);
+        instance.saveLineStat(exStat);
         List<LineStat> ls = instance.selectLineStat();
+        assertFalse(ls.isEmpty());
+        assertTrue(ls.contains(exStat));
         System.out.println(ls);
-        instance.saveLineStat(new LineStat("Longet", "shortest", 34, 6.4424));
     }
 
     /**
      * Test of saveLineStats method, of class Persistence.
      */
-//    @Test
+    @Test
     public void testSaveLineStats() throws Exception {
         System.out.println("saveLineStats");
-        Collection<LineStat> col = null;
-        Persistence instance = new Persistence();
+        Collection<LineStat> col = Arrays.asList(new LineStat("loooooooooooong", "srt", 34, 7.28), new LineStat("BIIIIIGWORD", "o", 225, 10.5));
         instance.saveLineStats(col);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        List<LineStat> selectLineStat = instance.selectLineStat();
+        assertTrue(selectLineStat.containsAll(col));
     }
 
 }

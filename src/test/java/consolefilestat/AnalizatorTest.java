@@ -7,6 +7,7 @@ package consolefilestat;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class AnalizatorTest {
      * Test of analizeWholeLines method, of class Analizator.
      */
     @Test
-    public void testAnalizeWholeLines() throws FileNotFoundException {
+    public void testAnalizeWholeLines() throws IOException {
         System.out.println("analizeWholeLines");
         instance.analizeWholeLines();
         List<LineStat> stats = instance.getStats();
@@ -67,7 +68,7 @@ public class AnalizatorTest {
         stats = instance.getStats();
         assertEquals(old, stats);
 
-        Analizator inst = new Analizator(new FileSource(new FileReader("test\\consolefilestat\\text")));
+        Analizator inst = new Analizator(new FileSource(new FileReader("src\\test\\resources\\text")));
         inst.analizeWholeLines();
         stats = inst.getStats();
         assertEquals(old, stats);

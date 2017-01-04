@@ -19,20 +19,32 @@ public class Analizator {
 
     private LinesSource lineSource;
     private List<LineStat> stats = new ArrayList<LineStat>();
+    private LineStat summarizedStat;
 
     public Analizator(LinesSource lineSource) {
         this.lineSource = lineSource;
     }
 
-    public void analizeWholeLines() {
-        try {
-            String line;
-            while ((line = lineSource.getNewLine()) != null) {
-                LineStat ls = analizeLine(line);
-                stats.add(ls);
+    public void analizeWholeLines() throws IOException {
+        summarizedStat = new LineStat("", "", 0, 0);
+        String line;
+        while ((line = lineSource.getNewLine()) != null) {
+            LineStat ls = analizeLine(line);
+            stats.add(ls);
+            String longest = ls.getLongest();
+
+            if (longest != null && longest.length() > summarizedStat.getLongest().length()) {
+                summarizedStat.setLongest(longest);
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            String shortest = ls.getShortest();
+            if (shortest != null && (summarizedStat.getShortest().isEmpty() || shortest.length() < summarizedStat.getShortest().length())) {
+                summarizedStat.setShortest(shortest);
+            }
+            summarizedStat.setLehgth(summarizedStat.getLehgth() + ls.getLehgth());
+            summarizedStat.setAvgWordLen(summarizedStat.getAvgWordLen() + ls.getAvgWordLen());
+        }
+        if (!stats.isEmpty()) {
+            summarizedStat.setAvgWordLen(summarizedStat.getAvgWordLen() / stats.size());
         }
     }
 
@@ -71,6 +83,13 @@ public class Analizator {
         }
 
         return new LineStat(longest, shortest, len, wordsCount == 0 ? 0 : (double) sumOfWordLength / wordsCount);
+    }
+
+    public LineStat getSummarizedStat() {
+        if (summarizedStat == null) {
+            throw new IllegalStateException("You should call analizeWholeLines() first");
+        }
+        return summarizedStat;
     }
 
 }

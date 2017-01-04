@@ -102,4 +102,8 @@ public class LineStat {
         }
         return true;
     }
+
+    public String prettyToString() {
+        return "Longest word(" + longest + "), shortest word(" + shortest + "), whole length(" + lehgth + "), average word length(" + avgWordLen + ")";
+    }
 }
